@@ -2,15 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>AirplaneJS</title>
+  <title>AirplaneJS — Live ADS-B Radar</title>
+  <meta name="description" content="Real-time ADS-B aircraft tracker powered by dump1090-fa. See planes on a live map.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <div id="map"></div>
-  <div id="info"></div>
-  <script async defer src="assets/client.js"></script>
-  <script async defer src="assets/jquery-3.2.1.min.js"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDW2g5wIVUhuI50CNZrkfg-zreJF_2tsdk&callback=initMap"></script>
+  <div id="app">
+    <div id="map"></div>
+
+    <!-- Top bar -->
+    <header id="topbar">
+      <div class="topbar-left">
+        <span class="logo">✈️ AirplaneJS</span>
+        <span class="separator">|</span>
+        <span id="status-indicator" class="status connecting">
+          <span class="status-dot"></span>
+          <span id="status-text">Connecting…</span>
+        </span>
+      </div>
+      <div class="topbar-right">
+        <div class="stat-chip" id="chip-count">
+          <span class="stat-label">Aircraft</span>
+          <span class="stat-value" id="aircraft-count">0</span>
+        </div>
+        <div class="stat-chip" id="chip-messages">
+          <span class="stat-label">Messages</span>
+          <span class="stat-value" id="messages-count">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Info panel -->
+    <aside id="info-panel" class="panel hidden">
+      <button id="info-close" class="panel-close" aria-label="Close">&times;</button>
+      <div id="info-content"></div>
+    </aside>
+
+    <!-- Aircraft list -->
+    <aside id="aircraft-list" class="panel">
+      <div class="panel-header">
+        <h2>Tracked Aircraft</h2>
+        <button id="list-toggle" class="panel-toggle" aria-label="Toggle list">▼</button>
+      </div>
+      <div id="aircraft-table-wrap" class="panel-body">
+        <table id="aircraft-table">
+          <thead>
+            <tr>
+              <th>ICAO</th>
+              <th>Callsign</th>
+              <th>Alt (ft)</th>
+              <th>Spd (kts)</th>
+              <th>Hdg</th>
+              <th>Squawk</th>
+            </tr>
+          </thead>
+          <tbody id="aircraft-tbody"></tbody>
+        </table>
+      </div>
+    </aside>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="assets/client.js"></script>
 </body>
 </html>

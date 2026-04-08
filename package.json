@@ -1,7 +1,7 @@
 {
   "name": "airplanejs",
-  "version": "1.4.2",
-  "description": "📡✈️ App that picks up ADS-B radio signals from airplanes and plots them in real time on a map in your browser",
+  "version": "2.0.0",
+  "description": "📡✈️ App that reads ADS-B data from dump1090-fa and plots aircraft in real time on a map in your browser",
   "bin": "server.js",
   "dependencies": {
     "csv-parser": "^1.12.0",
@@ -9,11 +9,8 @@
     "get-port": "^3.2.0",
     "mime-types": "^2.1.17",
     "minimist": "^1.2.0",
-    "mode-s-aircraft-store": "^1.0.0",
-    "mode-s-demodulator": "^1.0.0",
     "opn": "^5.1.0",
-    "patterns": "^1.0.3",
-    "rtl-sdr": "^0.1.2"
+    "patterns": "^1.0.3"
   },
   "devDependencies": {
     "standard": "^10.0.3"
@@ -24,6 +21,8 @@
     "data-airports": "mkdir -p data && curl -o data/airports.csv https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat",
     "data-routes": "mkdir -p data && curl -o data/routes.csv https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat",
     "postinstall": "npm run data",
+    "start": "node server.js --no-browser",
+    "dump1090": "~/dump1090/dump1090 --net --net-http-port 8080 --interactive",
     "test": "standard"
   },
   "repository": {
@@ -39,17 +38,17 @@
     "mode-s",
     "adsb",
     "ads-b",
-    "sdr",
-    "rtlsdr",
-    "rtl-sdr",
-    "librtlsdr",
+    "dump1090",
+    "dump1090-fa",
     "radio",
     "aircraft",
     "airplane",
     "airplanes",
     "plane",
     "1090",
-    "1090mhz"
+    "1090mhz",
+    "leaflet",
+    "openstreetmap"
   ],
   "author": "Thomas Watson <w@tson.dk> (https://twitter.com/wa7son)",
   "license": "MIT",

@@ -7,7 +7,7 @@ const debug = require('debug')('airplanejs')
 const getPort = require('get-port')
 const opn = require('opn')
 const patterns = require('patterns')()
-const rtlsdr = require('./lib/rtlsdr')
+const dump1090 = require('./lib/dump1090')
 const routes = require('./lib/routes')
 
 process.on('SIGINT', exit)
@@ -23,8 +23,8 @@ if (argv.version || argv.v) {
   process.exit()
 }
 
-// Start radio
-rtlsdr.start(argv)
+// Start dump1090-fa poller
+dump1090.start(argv)
 
 patterns.add('GET /', routes.index)
 patterns.add('GET /assets/{file}', routes.assets)
@@ -73,19 +73,16 @@ function help () {
   console.log('  airplanejs [options]')
   console.log()
   console.log('Options:')
-  console.log('  --help -h            Show this help')
-  console.log('  --version -v         Output AirplaneJS version')
-  console.log('  --device -d <index>  Select RTL dongle (default: 0)')
-  console.log('  --frequency -f <hz>  Set custom frequency (default: 1090000000)')
-  console.log('  --gain -g <gain>     Set custom tuner gain')
-  console.log('  --auto-gain          Disable manual tuner gain (default: off)')
-  console.log('  --enable-agc         Use Automatic Gain Control (default: off)')
-  console.log('  --port -p <port>     Set custom HTTP server port (default: 3000)')
-  console.log('  --no-browser         Disable automatic opening of default browser')
+  console.log('  --help -h                    Show this help')
+  console.log('  --version -v                 Output AirplaneJS version')
+  console.log('  --dump1090-host -H <host>    dump1090 host (default: localhost)')
+  console.log('  --dump1090-port -P <port>    dump1090 SBS port (default: 30003)')
+  console.log('  --port -p <port>             Set custom HTTP server port (default: 3000)')
+  console.log('  --no-browser                 Disable automatic opening of default browser')
 }
 
 function exit () {
-  console.log('Closing down RTL-SDR device...')
-  rtlsdr.stop()
+  console.log('Stopping dump1090-fa poller...')
+  dump1090.stop()
   process.exit()
 }
