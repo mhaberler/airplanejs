@@ -3,17 +3,19 @@
   "version": "2.0.0",
   "description": "📡✈️ App that reads ADS-B data from dump1090-fa and plots aircraft in real time on a map in your browser",
   "bin": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
-    "csv-parser": "^1.12.0",
-    "debug": "^3.1.0",
-    "get-port": "^3.2.0",
-    "mime-types": "^2.1.17",
-    "minimist": "^1.2.0",
-    "opn": "^5.1.0",
+    "csv-parser": "^3.2.0",
+    "debug": "^4.4.0",
+    "get-port": "^5.1.1",
+    "mime-types": "^2.1.35",
+    "minimist": "^1.2.8",
     "patterns": "^1.0.3"
   },
   "devDependencies": {
-    "standard": "^10.0.3"
+    "standard": "^17.1.0"
   },
   "scripts": {
     "data": "npm run data-airlines && npm run data-airports && npm run data-routes",
@@ -27,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/watson/airplanejs.git"
+    "url": "git+https://github.com/AurelienLoyer/airplanejs.git"
   },
   "keywords": [
     "map",
@@ -53,9 +55,9 @@
   "author": "Thomas Watson <w@tson.dk> (https://twitter.com/wa7son)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/watson/airplanejs/issues"
+    "url": "https://github.com/AurelienLoyer/airplanejs/issues"
   },
-  "homepage": "https://github.com/watson/airplanejs#readme",
+  "homepage": "https://github.com/AurelienLoyer/airplanejs#readme",
   "coordinates": [
     55.777598,
     12.58985

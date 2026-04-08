@@ -3,9 +3,9 @@
 
 const url = require('url')
 const http = require('http')
+const { exec } = require('child_process')
 const debug = require('debug')('airplanejs')
 const getPort = require('get-port')
-const opn = require('opn')
 const patterns = require('patterns')()
 const dump1090 = require('./lib/dump1090')
 const routes = require('./lib/routes')
@@ -23,7 +23,7 @@ if (argv.version || argv.v) {
   process.exit()
 }
 
-// Start dump1090-fa poller
+// Start dump1090 connector
 dump1090.start(argv)
 
 patterns.add('GET /', routes.index)
@@ -63,7 +63,7 @@ function listen (port) {
       console.log('Server running at: %s', url)
     } else {
       console.log('Opening %s in your favorite browser...', url)
-      opn(url)
+      openBrowser(url)
     }
   })
 }
@@ -81,8 +81,15 @@ function help () {
   console.log('  --no-browser                 Disable automatic opening of default browser')
 }
 
+function openBrowser (url) {
+  const cmd = process.platform === 'darwin' ? 'open'
+    : process.platform === 'win32' ? 'start'
+    : 'xdg-open'
+  exec(cmd + ' ' + url)
+}
+
 function exit () {
-  console.log('Stopping dump1090-fa poller...')
+  console.log('Stopping dump1090 connector...')
   dump1090.stop()
   process.exit()
 }
