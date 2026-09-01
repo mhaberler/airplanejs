@@ -5,7 +5,7 @@ const url = require('url')
 const http = require('http')
 const { exec } = require('child_process')
 const debug = require('debug')('airplanejs')
-const getPort = require('get-port')
+const getPortPromise = import('get-port').then(({ default: getPort }) => getPort)
 const patterns = require('patterns')()
 const dump1090 = require('./lib/dump1090')
 const routes = require('./lib/routes')
@@ -54,7 +54,7 @@ const server = http.createServer(function (req, res) {
 const customPort = argv.port || argv.p
 
 if (customPort) listen(customPort)
-else getPort({port: 3000}).then(listen)
+else getPortPromise.then((getPort) => getPort({ port: 3000 })).then(listen)
 
 function listen (port) {
   server.listen(port, function () {
