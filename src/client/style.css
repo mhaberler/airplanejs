@@ -137,6 +137,8 @@ html, body {
   gap: 6px;
   font-size: 12px;
   font-weight: 500;
+  min-width: 170px;
+  white-space: nowrap;
 }
 
 .status-dot {
@@ -184,7 +186,8 @@ html, body {
   background: var(--gradient-glow);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  min-width: 80px;
+  width: 88px;
+  min-width: 88px;
 }
 
 .stat-label {
@@ -383,14 +386,16 @@ html, body {
   bottom: 0;
   left: 0;
   right: 0;
-  max-height: 280px;
+  height: 280px;
+  display: flex;
+  flex-direction: column;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   overflow: hidden;
-  transition: max-height var(--transition-normal), transform var(--transition-normal);
+  transition: height var(--transition-normal), transform var(--transition-normal);
 }
 
 #aircraft-list.collapsed {
-  max-height: 44px;
+  height: 44px;
 }
 
 .panel-header {
@@ -401,6 +406,7 @@ html, body {
   border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .panel-header h2 {
@@ -435,8 +441,9 @@ html, body {
 }
 
 .panel-body {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  max-height: 236px;
 }
 
 .panel-body::-webkit-scrollbar {

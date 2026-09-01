@@ -2,20 +2,19 @@
   "name": "airplanejs",
   "version": "2.0.0",
   "description": "📡✈️ App that reads ADS-B data from dump1090-fa and plots aircraft in real time on a map in your browser",
-  "bin": "server.js",
+  "type": "module",
+  "bin": "dist/server/main.js",
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "csv-parser": "^3.2.1",
-    "debug": "^4.4.3",
-    "get-port": "^7.2.0",
-    "mime-types": "^3.0.2",
-    "minimist": "^1.2.8",
-    "patterns": "^1.0.3"
+    "leaflet": "^1.9.4"
   },
   "devDependencies": {
-    "standard": "^17.1.2"
+    "@types/leaflet": "^1.9.22",
+    "@types/node": "^26.4.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
   },
   "scripts": {
     "data": "npm run data-airlines && npm run data-airports && npm run data-routes",
@@ -23,9 +22,12 @@
     "data-airports": "mkdir -p data && curl -o data/airports.csv https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat",
     "data-routes": "mkdir -p data && curl -o data/routes.csv https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat",
     "postinstall": "npm run data",
-    "start": "node server.js --no-browser",
+    "dev": "bun --watch src/server/main.ts",
+    "build": "bunx vite build && bunx tsc -p tsconfig.server.json",
+    "start": "NODE_ENV=production bun dist/server/main.js --no-browser",
+    "typecheck": "bunx tsc -p tsconfig.server.json --noEmit && bunx tsc -p tsconfig.client.json --noEmit",
     "dump1090": "~/dump1090/dump1090 --net --net-http-port 8080 --interactive",
-    "test": "standard"
+    "test": "npm run typecheck"
   },
   "repository": {
     "type": "git",
