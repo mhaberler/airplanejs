@@ -393,7 +393,7 @@ function showInfoPanel (aircraft) {
     ? (aircraft.vertRate > 0 ? '↑ ' : aircraft.vertRate < 0 ? '↓ ' : '') + Math.abs(aircraft.vertRate) + ' ft/min'
     : '—'
   const squawk = aircraft.squawk || '—'
-  const rssi = aircraft.rssi !== null ? aircraft.rssi.toFixed(1) + ' dBFS' : '—'
+  const rssi = (aircraft.rssi !== null && aircraft.rssi !== undefined) ? aircraft.rssi.toFixed(1) + ' dBFS' : '—'
 
   const ICAO = aircraft.callsign && aircraft.callsign.slice(0, 3)
   const airline = ICAO && airlineICAOIndex[ICAO]
