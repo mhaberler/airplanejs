@@ -126,7 +126,6 @@ function bindEvents (): void {
     updateTable()
   })
 
-  document.getElementById('list-toggle')?.addEventListener('click', toggleList)
   document.querySelector('.panel-header')?.addEventListener('click', toggleList)
 }
 

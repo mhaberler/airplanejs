@@ -68,6 +68,11 @@ html, body {
   font-family: var(--font) !important;
 }
 
+/* Keep Leaflet controls clear of the fixed topbar */
+.leaflet-top {
+  top: 56px;
+}
+
 .leaflet-control-zoom a {
   background: var(--bg-glass) !important;
   color: var(--text-primary) !important;
