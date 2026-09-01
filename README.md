@@ -1,12 +1,14 @@
 # AirplaneJS
 
-📡 ✈️ An app written in JavaScript that reads ADS-B data from [dump1090-fa](https://github.com/flightaware/dump1090) and plots aircraft in real time on a map in your browser ✨🐢🚀✨
+📡 ✈️ A TypeScript app that reads ADS-B data from [dump1090-fa](https://github.com/flightaware/dump1090) and plots aircraft in real time on a map in your browser.
+
+![AirplaneJS screenshot](assets/screenshot.png)
 
 ## Prerequisites
 
 ### dump1090-fa
 
-This software requires a running instance of [dump1090-fa](https://github.com/flightaware/dump1090) (FlightAware's fork of dump1090). dump1090-fa handles the RTL-SDR hardware and decodes the ADS-B signals — AirplaneJS connects to its JSON API to display the data.
+This software requires a running instance of [dump1090-fa](https://github.com/flightaware/dump1090) (FlightAware's fork of dump1090). dump1090-fa handles the RTL-SDR hardware and decodes the ADS-B signals — AirplaneJS connects to its **SBS/BaseStation TCP feed** (port `30003` by default).
 
 #### Installing dump1090-fa
 
@@ -22,7 +24,6 @@ sudo apt-get install dump1090-fa
 
 ```bash
 brew install dump1090-mutability
-# or build dump1090-fa from source
 ```
 
 **From source:**
@@ -31,10 +32,10 @@ brew install dump1090-mutability
 git clone https://github.com/flightaware/dump1090.git
 cd dump1090
 make
-./dump1090 --net --interactive
+./dump1090 --net --net-sbs-port 30003 --interactive
 ```
 
-Make sure dump1090-fa is running with network output enabled (`--net` flag). By default, it serves aircraft data at `http://localhost:8080/data/aircraft.json`.
+Make sure dump1090-fa is running with SBS/BaseStation output enabled (the `--net` family of flags). AirplaneJS reads the feed over TCP.
 
 ### Hardware
 
@@ -42,30 +43,31 @@ You'll need an [RTL-SDR USB dongle with an RTL2832U chip](https://www.rtl-sdr.co
 
 ### Software
 
-- [Node.js](https://nodejs.org) (v14 or later)
+- [Bun](https://bun.sh) (or Node.js 18+) for running the server
 - [dump1090-fa](https://github.com/flightaware/dump1090) running and accessible
 
 ## Usage
 
 ### Quick start
 
-1. Make sure dump1090-fa is running:
+1. Make sure dump1090-fa is running with network output:
    ```bash
    dump1090-fa --net
    ```
 
-2. Start AirplaneJS:
+2. Install dependencies (also fetches the OpenFlights data files) and run:
    ```bash
-   npx airplanejs
+   bun install
+   bun run dev
    ```
 
-Your default browser should automatically open to [http://localhost:3000](http://localhost:3000).
+Your browser should automatically open to the URL logged on startup.
 
-### Install globally
+### Production
 
 ```bash
-npm install airplanejs -g
-airplanejs
+bun run build   # vite build (client) + tsc (server) → dist/
+bun start       # NODE_ENV=production bun dist/server/main.js --no-browser
 ```
 
 ### Options
@@ -74,31 +76,36 @@ airplanejs
 |---|---|---|---|
 | `--help` | `-h` | | Show help |
 | `--version` | `-v` | | Output version |
-| `--dump1090-host` | `-H` | `localhost` | dump1090-fa host |
-| `--dump1090-port` | `-P` | `8080` | dump1090-fa port |
-| `--dump1090-path` | | `/data/aircraft.json` | JSON endpoint path |
-| `--dump1090-https` | | `false` | Use HTTPS |
-| `--dump1090-interval` | `-i` | `1000` | Poll interval (ms) |
-| `--port` | `-p` | `3000` | HTTP server port |
+| `--dump1090-host` | `-H` | `adsb.local` | dump1090 SBS host |
+| `--dump1090-port` | `-P` | `30003` | dump1090 SBS/BaseStation port |
+| `--port` | `-p` | auto (free port) | HTTP server port |
 | `--no-browser` | | | Don't open browser |
 
 ### Examples
 
 ```bash
-# Connect to dump1090-fa on a Raspberry Pi
-airplanejs --dump1090-host 192.168.1.100
+# Connect to dump1090 on a Raspberry Pi
+bun dist/server/main.js --dump1090-host 192.168.1.100
 
-# Connect to dump1090-fa on a custom port
-airplanejs --dump1090-host piaware.local --dump1090-port 8888
-
-# Run on port 8000 without opening browser
-airplanejs --port 8000 --no-browser
+# Custom ports, no browser
+bun dist/server/main.js --dump1090-host piaware.local --dump1090-port 30003 --port 8000 --no-browser
 ```
+
+## Scripts
+
+| Script | Command |
+|---|---|
+| `dev` | `bun --watch src/server/main.ts` |
+| `build` | `bunx vite build && bunx tsc -p tsconfig.server.json` |
+| `start` | `NODE_ENV=production bun dist/server/main.js --no-browser` |
+| `typecheck` | `bunx tsc` on both configs (`--noEmit`) |
+| `test` | `npm run typecheck` |
+| `data` | downloads the OpenFlights CSVs |
 
 ## Features
 
-- 🗺️ **Live map** with dark theme (OpenStreetMap / CartoDB)
-- ✈️ **Aircraft markers** colored by altitude
+- 🗺️ **Live map** with dark theme (OpenStreetMap tiles)
+- ✈️ **Aircraft markers** colored by altitude, rotated by heading
 - 📊 **Aircraft list** with real-time updates
 - 📡 **Detailed info panel** showing altitude, speed, heading, squawk, RSSI, vertical rate
 - 🔗 **Direct links** to Flightradar24 and ADS-B Exchange
@@ -108,18 +115,30 @@ airplanejs --port 8000 --no-browser
 ## Architecture
 
 ```
-RTL-SDR USB → dump1090-fa (decoding) → HTTP JSON API → AirplaneJS (visualization)
+RTL-SDR USB → dump1090-fa (decoding) → SBS/BaseStation TCP (30003) → AirplaneJS server → browser (Leaflet)
 ```
 
-AirplaneJS polls dump1090-fa's `aircraft.json` endpoint and serves a web interface with a live map.
+The server ingests the SBS feed (`src/server/dump1090.ts`), stores live aircraft in memory (`src/server/store.ts`), and serves the data plus a Vite-bundled Leaflet client. See [TYPESCRIPT.md](TYPESCRIPT.md) for the full module breakdown.
+
+## Project structure
+
+```
+src/
+  shared/types.ts     shared domain types
+  server/             Node server (HTTP router, dump1090 client, store)
+  client/             Leaflet browser app
+index.html            Vite entry
+vite.config.ts
+tsconfig.{base,server,client}.json
+```
 
 ## Migrating from v1
 
-Version 2.0 replaces the direct RTL-SDR access (via `rtl-sdr` and `mode-s-demodulator` npm packages) with dump1090-fa integration. This means:
+Version 2.0 replaces direct RTL-SDR access with dump1090-fa integration. This means:
 
 - ✅ No more native compilation issues
 - ✅ No Python 2 dependency
-- ✅ Works with modern Node.js
+- ✅ Works with modern Node.js / Bun
 - ✅ Better decoding (dump1090-fa is the gold standard)
 - ✅ Free map tiles (no Google Maps API key needed)
 
